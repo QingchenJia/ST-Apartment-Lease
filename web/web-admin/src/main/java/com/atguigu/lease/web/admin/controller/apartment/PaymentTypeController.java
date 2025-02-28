@@ -18,22 +18,23 @@ public class PaymentTypeController {
     private PaymentTypeService paymentTypeService;
 
     @Operation(summary = "查询全部支付方式列表")
-    @GetMapping("list")
+    @GetMapping("/list")
     public Result<List<PaymentType>> listPaymentType() {
         List<PaymentType> paymentTypes = paymentTypeService.list();
         return Result.ok(paymentTypes);
     }
 
     @Operation(summary = "保存或更新支付方式")
-    @PostMapping("saveOrUpdate")
+    @PostMapping("/saveOrUpdate")
     public Result<?> saveOrUpdatePaymentType(@RequestBody PaymentType paymentType) {
+        paymentTypeService.saveOrUpdate(paymentType);
         return Result.ok();
     }
 
     @Operation(summary = "根据ID删除支付方式")
-    @DeleteMapping("deleteById")
+    @DeleteMapping("/deleteById")
     public Result<?> deletePaymentById(@RequestParam Long id) {
+        paymentTypeService.removeById(id);
         return Result.ok();
     }
-
 }
