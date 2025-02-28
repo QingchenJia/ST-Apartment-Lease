@@ -19,7 +19,6 @@ public class Knife4jConfiguration {
 
     @Bean
     public GroupedOpenApi systemAPI() {
-
         return GroupedOpenApi.builder().group("系统信息管理").
                 pathsToMatch(
                         "/admin/system/**"
@@ -29,7 +28,6 @@ public class Knife4jConfiguration {
 
     @Bean
     public GroupedOpenApi loginAPI() {
-
         return GroupedOpenApi.builder().group("后台登录管理").
                 pathsToMatch(
                         "/admin/login/**",
@@ -40,7 +38,6 @@ public class Knife4jConfiguration {
 
     @Bean
     public GroupedOpenApi apartmentAPI() {
-
         return GroupedOpenApi.builder().group("公寓信息管理").
                 pathsToMatch(
                         "/admin/apartment/**",

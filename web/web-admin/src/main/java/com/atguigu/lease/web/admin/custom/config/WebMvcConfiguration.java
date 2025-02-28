@@ -10,8 +10,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
-
-
     @Autowired
     private StringToBaseEnumConverterFactory stringToBaseEnumConverterFactory;
 
@@ -23,9 +21,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         registry.addConverterFactory(this.stringToBaseEnumConverterFactory);
     }
 
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(this.authenticationInterceptor).addPathPatterns("/admin/**").excludePathPatterns("/admin/login/**");
+        /*registry.addInterceptor(this.authenticationInterceptor)
+                .addPathPatterns("/admin/**")
+                .excludePathPatterns("/admin/login/**");*/
     }
 }

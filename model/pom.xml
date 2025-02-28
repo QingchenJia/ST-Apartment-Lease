@@ -24,7 +24,6 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
 
-
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>

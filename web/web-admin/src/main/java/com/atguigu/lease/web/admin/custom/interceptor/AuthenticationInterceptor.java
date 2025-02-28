@@ -13,7 +13,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class AuthenticationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
         String token = request.getHeader("access-token");
 
         Claims claims = JwtUtil.parseToken(token);
@@ -22,7 +21,6 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         LoginUserHolder.setLoginUser(new LoginUser(userId, username));
 
         return true;
-
     }
 
     @Override

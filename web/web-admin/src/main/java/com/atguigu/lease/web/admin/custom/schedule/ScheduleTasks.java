@@ -13,15 +13,8 @@ import java.util.TimeZone;
 
 @Component
 public class ScheduleTasks {
-
     @Autowired
     private LeaseAgreementService service;
-
-//    @Scheduled(cron = "* * * * * *")
-//    public void test() {
-//        System.out.println(new Date());
-//    }
-
 
     @Scheduled(cron = "0 0 0 * * *")
     public void checkLeaseStatus() {

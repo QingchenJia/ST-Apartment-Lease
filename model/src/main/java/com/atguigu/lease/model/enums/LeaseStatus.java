@@ -2,9 +2,10 @@ package com.atguigu.lease.model.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
 
+@Getter
 public enum LeaseStatus implements BaseEnum {
-
     SIGNING(1, "签约待确认"),
     SIGNED(2, "已签约"),
     CANCELED(3, "已取消"),
@@ -15,23 +16,12 @@ public enum LeaseStatus implements BaseEnum {
 
     @EnumValue
     @JsonValue
-    private Integer code;
+    private final Integer code;
 
-    private String name;
+    private final String name;
 
     LeaseStatus(Integer code, String name) {
         this.code = code;
         this.name = name;
     }
-
-    @Override
-    public Integer getCode() {
-        return this.code;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
 }
