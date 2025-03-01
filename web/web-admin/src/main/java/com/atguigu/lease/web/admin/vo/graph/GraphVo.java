@@ -6,19 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Schema(description = "图片信息")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class GraphVo {
-
-
     @Schema(description = "图片名称")
     private String name;
 
     @Schema(description = "图片地址")
     private String url;
-
 }
