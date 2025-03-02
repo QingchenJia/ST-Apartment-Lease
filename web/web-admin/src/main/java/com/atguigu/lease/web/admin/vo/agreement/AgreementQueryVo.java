@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 @Schema(description = "租约查询实体")
 public class AgreementQueryVo {
-
     @Schema(description = "公寓所处省份id")
     private Long provinceId;
 
@@ -27,5 +26,4 @@ public class AgreementQueryVo {
 
     @Schema(description = "用户手机号码")
     private String phone;
-
 }

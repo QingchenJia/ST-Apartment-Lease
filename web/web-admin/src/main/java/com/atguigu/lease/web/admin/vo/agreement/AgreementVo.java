@@ -3,11 +3,12 @@ package com.atguigu.lease.web.admin.vo.agreement;
 import com.atguigu.lease.model.entity.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "租约信息")
 public class AgreementVo extends LeaseAgreement {
-
     @Schema(description = "签约公寓信息")
     private ApartmentInfo apartmentInfo;
 

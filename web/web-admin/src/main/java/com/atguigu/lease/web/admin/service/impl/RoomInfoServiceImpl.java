@@ -69,6 +69,7 @@ public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo> i
     private RoomLeaseTermService roomLeaseTermService;
 
     @Resource
+    @Lazy
     private LeaseAgreementService leaseAgreementService;
 
     @Resource

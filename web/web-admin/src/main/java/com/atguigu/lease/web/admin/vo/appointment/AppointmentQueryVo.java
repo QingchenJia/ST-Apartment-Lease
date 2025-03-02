@@ -6,8 +6,6 @@ import lombok.Data;
 @Data
 @Schema(description = "预约看房查询实体")
 public class AppointmentQueryVo {
-
-
     @Schema(description="预约公寓所在省份")
     private Long provinceId;
 
@@ -25,5 +23,4 @@ public class AppointmentQueryVo {
 
     @Schema(description="预约用户手机号码")
     private String phone;
-
 }
