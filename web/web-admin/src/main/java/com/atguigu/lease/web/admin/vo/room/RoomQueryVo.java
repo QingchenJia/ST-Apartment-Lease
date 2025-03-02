@@ -6,7 +6,6 @@ import lombok.Data;
 @Schema(description = "房间查询实体")
 @Data
 public class RoomQueryVo {
-
     @Schema(description = "省份Id")
     private Long provinceId;
 

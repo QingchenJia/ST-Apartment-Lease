@@ -4,14 +4,14 @@ import com.atguigu.lease.model.entity.RoomInfo;
 import com.atguigu.lease.web.admin.vo.graph.GraphVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "房间信息")
 public class RoomSubmitVo extends RoomInfo {
-
     @Schema(description = "图片列表")
     private List<GraphVo> graphVoList;
 
@@ -29,5 +29,4 @@ public class RoomSubmitVo extends RoomInfo {
 
     @Schema(description = "可选租期列表")
     private List<Long> leaseTermIds;
-
 }
