@@ -8,7 +8,6 @@ import lombok.Data;
 @Schema(description = "图像验证码")
 @AllArgsConstructor
 public class CaptchaVo {
-
     @Schema(description="验证码图片信息")
     private String image;
 
