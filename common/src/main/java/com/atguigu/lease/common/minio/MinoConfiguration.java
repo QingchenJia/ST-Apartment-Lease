@@ -12,13 +12,13 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(name = "minio.endpoint")
 public class MinoConfiguration {
     @Resource
-    private MinioProperties properties;
+    private MinioProperties minioProperties;
 
     @Bean
     public MinioClient minioClient() {
         return MinioClient.builder()
-                .endpoint(properties.getEndpoint())
-                .credentials(properties.getAccessKey(), properties.getSecretKey())
+                .endpoint(minioProperties.getEndpoint())
+                .credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey())
                 .build();
     }
 }

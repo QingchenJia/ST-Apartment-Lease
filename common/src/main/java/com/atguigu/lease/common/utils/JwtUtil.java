@@ -1,7 +1,6 @@
 package com.atguigu.lease.common.utils;
 
 import com.atguigu.lease.common.exception.LeaseException;
-import com.atguigu.lease.common.login.LoginUser;
 import com.atguigu.lease.common.result.ResultCodeEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -69,12 +68,10 @@ public class JwtUtil {
     }
 
     public static void main(String[] args) {
-        String token = createToken(3L, "alice");
-        System.out.println(token);
+        String adminToken = createToken(3L, "alice");
+        System.out.println(adminToken);
 
-        Claims claims = parseToken(token);
-        Long id = claims.get("id", Long.class);
-        String username = claims.get("username", String.class);
-        System.out.println(new LoginUser(id, username));
+        String appToken = createToken(2L, "18771803413");
+        System.out.println(appToken);
     }
 }
