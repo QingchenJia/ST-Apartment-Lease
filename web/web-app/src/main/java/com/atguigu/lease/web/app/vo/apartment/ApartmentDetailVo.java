@@ -6,15 +6,15 @@ import com.atguigu.lease.model.entity.LabelInfo;
 import com.atguigu.lease.web.app.vo.graph.GraphVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "APP端公寓信息详情")
 public class ApartmentDetailVo extends ApartmentInfo {
-
     @Schema(description = "图片列表")
     private List<GraphVo> graphVoList;
 

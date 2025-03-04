@@ -18,6 +18,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -33,6 +34,7 @@ import java.util.List;
 @Service
 public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo> implements RoomInfoService {
     @Resource
+    @Lazy
     private ApartmentInfoService apartmentInfoService;
 
     @Resource
@@ -291,5 +293,65 @@ public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo> i
 
         // 执行查询并返回结果列表
         return list(roomInfoQueryWrapper);
+    }
+
+    /**
+     * 根据公寓ID分页查询房间项
+     *
+     * @param current 当前页码
+     * @param size    每页大小
+     * @param id      公寓ID
+     * @return 分页的房间项VO列表
+     */
+    @Override
+    public IPage<RoomItemVo> pageItemByApartmentId(long current, long size, Long id) {
+        // 创建分页对象
+        Page<RoomInfo> page = new Page<>(current, size);
+
+        // 创建查询条件
+        LambdaQueryWrapper<RoomInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(RoomInfo::getApartmentId, id)
+                .eq(RoomInfo::getIsRelease, ReleaseStatus.RELEASED);
+
+        // 执行分页查询
+        page(page, queryWrapper);
+
+        // 获取查询结果列表
+        List<RoomInfo> roomInfos = page.getRecords();
+
+        // 将RoomInfo列表转换为RoomItemVo列表
+        List<RoomItemVo> roomItemVos = roomInfos.stream()
+                .map(roomInfo -> {
+                    RoomItemVo roomItemVo = new RoomItemVo();
+                    BeanUtils.copyProperties(roomInfo, roomItemVo);
+
+                    // 查询房间相关的图片信息
+                    List<GraphVo> graphVos = graphInfoService.listByRoomId(roomInfo.getId());
+                    if (!CollectionUtils.isEmpty(graphVos)) {
+                        roomItemVo.setGraphVoList(graphVos);
+                    }
+
+                    // 查询房间相关的标签信息
+                    List<LabelInfo> labelInfos = labelInfoService.listByRoomId(roomInfo.getId());
+                    if (!CollectionUtils.isEmpty(labelInfos)) {
+                        roomItemVo.setLabelInfoList(labelInfos);
+                    }
+
+                    // 查询房间相关的公寓信息
+                    ApartmentInfo apartmentInfo = apartmentInfoService.getById(roomInfo.getApartmentId());
+
+                    roomItemVo.setApartmentInfo(apartmentInfo);
+
+                    return roomItemVo;
+                })
+                .toList();
+
+        // 创建结果分页对象并设置属性
+        Page<RoomItemVo> resultPage = new Page<>();
+        BeanUtils.copyProperties(page, resultPage, "records");
+
+        resultPage.setRecords(roomItemVos);
+
+        return resultPage;
     }
 }

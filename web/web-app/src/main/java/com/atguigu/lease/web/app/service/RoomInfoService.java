@@ -20,4 +20,6 @@ public interface RoomInfoService extends IService<RoomInfo> {
     RoomDetailVo getDetailById(Long id);
 
     List<RoomInfo> listByApartmentId(Long id);
+
+    IPage<RoomItemVo> pageItemByApartmentId(long current, long size, Long id);
 }
