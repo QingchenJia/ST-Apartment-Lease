@@ -7,13 +7,14 @@ import com.atguigu.lease.web.app.vo.fee.FeeValueVo;
 import com.atguigu.lease.web.app.vo.graph.GraphVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "APP房间详情")
 public class RoomDetailVo extends RoomInfo {
-
     @Schema(description = "所属公寓信息")
     private ApartmentItemVo apartmentItemVo;
 
@@ -37,5 +38,4 @@ public class RoomDetailVo extends RoomInfo {
 
     @Schema(description = "租期列表")
     private List<LeaseTerm> leaseTermList;
-
 }

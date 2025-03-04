@@ -8,8 +8,6 @@ import java.math.BigDecimal;
 @Data
 @Schema(description = "房间查询实体")
 public class RoomQueryVo {
-
-
     @Schema(description = "省份Id")
     private Long provinceId;
 
@@ -30,5 +28,4 @@ public class RoomQueryVo {
 
     @Schema(description = "价格排序方式", allowableValues = {"desc", "asc"})
     private String orderType;
-
 }

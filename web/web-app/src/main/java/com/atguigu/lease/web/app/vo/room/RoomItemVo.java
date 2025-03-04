@@ -1,6 +1,5 @@
 package com.atguigu.lease.web.app.vo.room;
 
-
 import com.atguigu.lease.model.entity.ApartmentInfo;
 import com.atguigu.lease.model.entity.LabelInfo;
 import com.atguigu.lease.web.app.vo.graph.GraphVo;
@@ -14,7 +13,6 @@ import java.util.List;
 @Schema(description = "APP房间列表实体")
 @Data
 public class RoomItemVo {
-
     @Schema(description = "房间id")
     private Long id;
 
@@ -32,5 +30,4 @@ public class RoomItemVo {
 
     @Schema(description = "房间所属公寓信息")
     private ApartmentInfo apartmentInfo;
-
 }
