@@ -7,6 +7,8 @@ import com.atguigu.lease.web.app.vo.room.RoomQueryVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * @author liubo
  * &#064;description  针对表【room_info(房间信息表)】的数据库操作Service
@@ -16,4 +18,6 @@ public interface RoomInfoService extends IService<RoomInfo> {
     IPage<RoomItemVo> pageItem(long current, long size, RoomQueryVo queryVo);
 
     RoomDetailVo getDetailById(Long id);
+
+    List<RoomInfo> listByApartmentId(Long id);
 }
