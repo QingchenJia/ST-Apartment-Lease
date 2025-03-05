@@ -1,5 +1,7 @@
 package com.atguigu.lease.web.app.service.impl;
 
+import com.atguigu.lease.common.login.LoginUser;
+import com.atguigu.lease.common.login.LoginUserHolder;
 import com.atguigu.lease.model.entity.*;
 import com.atguigu.lease.model.enums.LeaseStatus;
 import com.atguigu.lease.model.enums.ReleaseStatus;
@@ -63,6 +65,10 @@ public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo> i
 
     @Resource
     private LeaseTermService leaseTermService;
+
+    @Resource
+    @Lazy
+    private BrowsingHistoryService browsingHistoryService;
 
     /**
      * 根据分页和查询条件获取房间列表
@@ -271,6 +277,10 @@ public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo> i
         if (!CollectionUtils.isEmpty(leaseTerms)) {
             roomDetailVo.setLeaseTermList(leaseTerms);
         }
+
+        // 保存此次查询的浏览记录
+        LoginUser loginUser = LoginUserHolder.getLoginUser();
+        browsingHistoryService.recordHistory(id, loginUser.getId());
 
         // 返回包含房间详细信息的RoomDetailVo对象
         return roomDetailVo;

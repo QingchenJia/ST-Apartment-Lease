@@ -1,19 +1,18 @@
 package com.atguigu.lease.web.app.vo.history;
 
-
 import com.atguigu.lease.model.entity.BrowsingHistory;
-import com.atguigu.lease.model.enums.ReleaseStatus;
 import com.atguigu.lease.web.app.vo.graph.GraphVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "浏览历史基本信息")
 public class HistoryItemVo extends BrowsingHistory {
-
     @Schema(description = "房间号")
     private String roomNumber;
 
@@ -34,5 +33,4 @@ public class HistoryItemVo extends BrowsingHistory {
 
     @Schema(description = "区县名称")
     private String districtName;
-
 }
