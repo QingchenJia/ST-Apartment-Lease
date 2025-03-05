@@ -12,7 +12,6 @@ import java.util.List;
 @Data
 @Schema(description = "APP端预约看房基本信息")
 public class AppointmentItemVo {
-
     @Schema(description = "预约Id")
     private Long id;
 
