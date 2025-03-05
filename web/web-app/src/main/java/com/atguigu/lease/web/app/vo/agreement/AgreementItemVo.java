@@ -14,7 +14,6 @@ import java.util.List;
 @Data
 @Schema(description = "租约基本信息")
 public class AgreementItemVo {
-
     @Schema(description = "租约id")
     private Long id;
 
@@ -43,5 +42,4 @@ public class AgreementItemVo {
 
     @Schema(description = "租金")
     private BigDecimal rent;
-    
 }

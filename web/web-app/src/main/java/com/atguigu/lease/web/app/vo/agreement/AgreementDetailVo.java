@@ -4,13 +4,14 @@ import com.atguigu.lease.model.entity.LeaseAgreement;
 import com.atguigu.lease.web.app.vo.graph.GraphVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "租约详细信息")
 public class AgreementDetailVo extends LeaseAgreement {
-
     @Schema(description = "公寓名称")
     private String apartmentName;
 
@@ -31,5 +32,4 @@ public class AgreementDetailVo extends LeaseAgreement {
 
     @Schema(description = "租期单位")
     private String leaseTermUnit;
-
 }

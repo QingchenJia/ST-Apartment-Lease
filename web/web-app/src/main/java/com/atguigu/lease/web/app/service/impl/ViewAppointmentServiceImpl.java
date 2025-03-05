@@ -41,26 +41,49 @@ public class ViewAppointmentServiceImpl extends ServiceImpl<ViewAppointmentMappe
     @Resource
     private RoomInfoService roomInfoService;
 
+    /**
+     * 获取当前用户的所有预约项目列表
+     * <p>
+     * 此方法首先获取当前登录用户的信息，然后查询该用户的所有预约记录
+     * 如果存在预约记录，则将这些记录转换为AppointmentItemVo对象，并添加额外的公寓信息和图表信息
+     * 如果不存在预约记录，则返回null
+     *
+     * @return 当前用户的预约项目列表，如果列表为空则返回null
+     */
     @Override
     public List<AppointmentItemVo> listItem() {
+        // 获取当前登录用户信息
         LoginUser loginUser = LoginUserHolder.getLoginUser();
 
+        // 创建查询条件，筛选出当前用户的预约记录
         LambdaQueryWrapper<ViewAppointment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ViewAppointment::getUserId, loginUser.getId());
 
+        // 执行查询，获取用户的预约记录
         List<ViewAppointment> viewAppointments = list(queryWrapper);
 
+        // 检查预约记录是否为空，如果为空则返回null
+        if (CollectionUtils.isEmpty(viewAppointments)) {
+            return null;
+        }
+
+        // 将查询到的预约记录转换为AppointmentItemVo对象，并添加额外的信息
         return viewAppointments.stream()
                 .map(viewAppointment -> {
+                    // 创建一个新的AppointmentItemVo对象
                     AppointmentItemVo appointmentItemVo = new AppointmentItemVo();
+                    // 将预约记录的属性复制到AppointmentItemVo对象中
                     BeanUtils.copyProperties(viewAppointment, appointmentItemVo);
 
+                    // 根据预约记录中的公寓ID获取公寓信息，并设置到AppointmentItemVo对象中
                     ApartmentInfo apartmentInfo = apartmentInfoService.getById(viewAppointment.getApartmentId());
                     appointmentItemVo.setApartmentName(apartmentInfo.getName());
 
+                    // 根据预约记录中的公寓ID获取所有相关的图表信息，并设置到AppointmentItemVo对象中
                     List<GraphVo> graphVos = graphInfoService.listByApartmentId(viewAppointment.getApartmentId());
                     appointmentItemVo.setGraphVoList(graphVos);
 
+                    // 返回转换后的AppointmentItemVo对象
                     return appointmentItemVo;
                 })
                 .toList();
