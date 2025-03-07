@@ -38,9 +38,6 @@ public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo> i
     private GraphInfoService graphInfoService;
 
     @Resource
-    private AttrKeyService attrKeyService;
-
-    @Resource
     private AttrValueService attrValueService;
 
     @Resource
@@ -308,95 +305,39 @@ public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo> i
         ApartmentInfo apartmentInfo = apartmentInfoService.getById(roomInfo.getApartmentId());
         roomDetailVo.setApartmentInfo(apartmentInfo);
 
-        // 创建查询条件，用于获取与房间ID和项类型为房间相关的图形信息
-        LambdaQueryWrapper<GraphInfo> graphInfoQueryWrapper = new LambdaQueryWrapper<>();
-        graphInfoQueryWrapper.eq(GraphInfo::getItemId, id)
-                .eq(GraphInfo::getItemType, ItemType.ROOM);
-
-        // 根据查询条件获取图形信息列表，并转换为GraphVo对象列表，设置到RoomDetailVo对象中
-        List<GraphInfo> graphInfos = graphInfoService.list(graphInfoQueryWrapper);
-        if (!CollectionUtils.isEmpty(graphInfos)) {
-            List<GraphVo> graphVos = graphInfos.stream()
-                    .map(graphInfo -> {
-                        GraphVo graphVo = new GraphVo();
-                        BeanUtils.copyProperties(graphInfo, graphVo);
-                        return graphVo;
-                    })
-                    .toList();
+        // 获取房间相关的图片信息，并设置到RoomDetailVo对象中
+        List<GraphVo> graphVos = graphInfoService.listByRoomId(id);
+        if (!CollectionUtils.isEmpty(graphVos)) {
             roomDetailVo.setGraphVoList(graphVos);
         }
 
-        // 创建查询条件，用于获取与房间ID相关的房间属性值列表
-        LambdaQueryWrapper<RoomAttrValue> roomAttrValueQueryWrapper = new LambdaQueryWrapper<>();
-        roomAttrValueQueryWrapper.eq(RoomAttrValue::getRoomId, id);
-
-        // 根据查询条件获取房间属性值列表，并转换为AttrValueVo对象列表，设置到RoomDetailVo对象中
-        List<RoomAttrValue> roomAttrValues = roomAttrValueService.list(roomAttrValueQueryWrapper);
-        if (!CollectionUtils.isEmpty(roomAttrValues)) {
-            List<AttrValueVo> attrValueVos = roomAttrValues.stream()
-                    .map(roomAttrValue -> {
-                        AttrValue attrValue = attrValueService.getById(roomAttrValue.getAttrValueId());
-                        AttrKey attrKey = attrKeyService.getById(attrValue.getAttrKeyId());
-
-                        AttrValueVo attrValueVo = new AttrValueVo();
-                        BeanUtils.copyProperties(attrValue, attrValueVo);
-                        attrValueVo.setAttrKeyName(attrKey.getName());
-
-                        return attrValueVo;
-                    })
-                    .toList();
+        // 获取房间相关的属性信息，并设置到RoomDetailVo对象中
+        List<AttrValueVo> attrValueVos = attrValueService.listByRoomId(id);
+        if (!CollectionUtils.isEmpty(attrValueVos)) {
             roomDetailVo.setAttrValueVoList(attrValueVos);
         }
 
-        // 创建查询条件，用于获取与房间ID相关的房间设施列表
-        LambdaQueryWrapper<RoomFacility> roomFacilityQueryWrapper = new LambdaQueryWrapper<>();
-        roomFacilityQueryWrapper.eq(RoomFacility::getRoomId, id);
-
-        // 根据查询条件获取房间设施列表，并转换为FacilityInfo对象列表，设置到RoomDetailVo对象中
-        List<RoomFacility> roomFacilities = roomFacilityService.list(roomFacilityQueryWrapper);
-        if (!CollectionUtils.isEmpty(roomFacilities)) {
-            List<FacilityInfo> facilityInfos = roomFacilities.stream()
-                    .map(roomFacility -> facilityInfoService.getById(roomFacility.getFacilityId()))
-                    .toList();
+        // 获取房间相关的设施信息，并设置到RoomDetailVo对象中
+        List<FacilityInfo> facilityInfos = facilityInfoService.listByRoomId(id);
+        if (!CollectionUtils.isEmpty(facilityInfos)) {
             roomDetailVo.setFacilityInfoList(facilityInfos);
         }
 
-        // 创建查询条件，用于获取与房间ID相关的房间标签列表
-        LambdaQueryWrapper<RoomLabel> roomLabelQueryWrapper = new LambdaQueryWrapper<>();
-        roomLabelQueryWrapper.eq(RoomLabel::getRoomId, id);
-
-        // 根据查询条件获取房间标签列表，并转换为LabelInfo对象列表，设置到RoomDetailVo对象中
-        List<RoomLabel> roomLabels = roomLabelService.list(roomLabelQueryWrapper);
-        if (!CollectionUtils.isEmpty(roomLabels)) {
-            List<LabelInfo> labelInfos = roomLabels.stream()
-                    .map(roomLabel -> labelInfoService.getById(roomLabel.getLabelId()))
-                    .toList();
+        // 获取房间相关的标签信息，并设置到RoomDetailVo对象中
+        List<LabelInfo> labelInfos = labelInfoService.listByRoomId(id);
+        if (!CollectionUtils.isEmpty(labelInfos)) {
             roomDetailVo.setLabelInfoList(labelInfos);
         }
 
-        // 创建查询条件，用于获取与房间ID相关的房间支付类型列表
-        LambdaQueryWrapper<RoomPaymentType> roomPaymentTypeQueryWrapper = new LambdaQueryWrapper<>();
-        roomPaymentTypeQueryWrapper.eq(RoomPaymentType::getRoomId, id);
-
-        // 根据查询条件获取房间支付类型列表，并转换为PaymentType对象列表，设置到RoomDetailVo对象中
-        List<RoomPaymentType> roomPaymentTypes = roomPaymentTypeService.list(roomPaymentTypeQueryWrapper);
-        if (!CollectionUtils.isEmpty(roomPaymentTypes)) {
-            List<PaymentType> paymentTypes = roomPaymentTypes.stream()
-                    .map(roomPaymentType -> paymentTypeService.getById(roomPaymentType.getPaymentTypeId()))
-                    .toList();
+        // 获取房间相关的付款方式信息，并设置到RoomDetailVo对象中
+        List<PaymentType> paymentTypes = paymentTypeService.listByRoomId(id);
+        if (!CollectionUtils.isEmpty(paymentTypes)) {
             roomDetailVo.setPaymentTypeList(paymentTypes);
         }
 
-        // 创建查询条件，用于获取与房间ID相关的房间租赁期限列表
-        LambdaQueryWrapper<RoomLeaseTerm> roomLeaseTermQueryWrapper = new LambdaQueryWrapper<>();
-        roomLeaseTermQueryWrapper.eq(RoomLeaseTerm::getRoomId, id);
-
-        // 根据查询条件获取房间租赁期限列表，并转换为LeaseTerm对象列表，设置到RoomDetailVo对象中
-        List<RoomLeaseTerm> roomLeaseTerms = roomLeaseTermService.list(roomLeaseTermQueryWrapper);
-        if (!CollectionUtils.isEmpty(roomLeaseTerms)) {
-            List<LeaseTerm> leaseTerms = roomLeaseTerms.stream()
-                    .map(roomLeaseTerm -> leaseTermService.getById(roomLeaseTerm.getLeaseTermId()))
-                    .toList();
+        // 获取房间相关的租赁期限信息，并设置到RoomDetailVo对象中
+        List<LeaseTerm> leaseTerms = leaseTermService.listByRoomId(id);
+        if (!CollectionUtils.isEmpty(leaseTerms)) {
             roomDetailVo.setLeaseTermList(leaseTerms);
         }
 

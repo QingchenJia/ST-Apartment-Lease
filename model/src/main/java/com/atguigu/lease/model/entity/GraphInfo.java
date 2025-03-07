@@ -1,10 +1,11 @@
 package com.atguigu.lease.model.entity;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import com.atguigu.lease.model.enums.ItemType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
 
