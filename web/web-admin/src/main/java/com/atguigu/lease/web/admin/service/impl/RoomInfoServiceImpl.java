@@ -1,5 +1,6 @@
 package com.atguigu.lease.web.admin.service.impl;
 
+import com.atguigu.lease.common.constant.RedisConstant;
 import com.atguigu.lease.model.entity.*;
 import com.atguigu.lease.model.enums.ItemType;
 import com.atguigu.lease.model.enums.LeaseStatus;
@@ -19,6 +20,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -76,6 +78,9 @@ public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo> i
     @Lazy
     private ApartmentInfoService apartmentInfoService;
 
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
     /**
      * 保存或更新房间信息
      *
@@ -123,6 +128,10 @@ public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo> i
             LambdaQueryWrapper<RoomLeaseTerm> roomLeaseTermQueryWrapper = new LambdaQueryWrapper<>();
             roomLeaseTermQueryWrapper.eq(RoomLeaseTerm::getRoomId, roomId);
             roomLeaseTermService.remove(roomLeaseTermQueryWrapper);
+
+            // 房间数据更新后，删除缓存
+            String key = RedisConstant.APP_ROOM_PREFIX + roomId;
+            redisTemplate.delete(key);
         }
 
         // 处理房间图形信息
@@ -436,5 +445,9 @@ public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo> i
         LambdaQueryWrapper<RoomLeaseTerm> roomLeaseTermQueryWrapper = new LambdaQueryWrapper<>();
         roomLeaseTermQueryWrapper.eq(RoomLeaseTerm::getRoomId, id);
         roomLeaseTermService.remove(roomLeaseTermQueryWrapper);
+
+        // 房间数据更新后，删除缓存
+        String key = RedisConstant.APP_ROOM_PREFIX + id;
+        redisTemplate.delete(key);
     }
 }

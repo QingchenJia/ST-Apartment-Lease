@@ -1,5 +1,6 @@
 package com.atguigu.lease.web.app.service.impl;
 
+import com.atguigu.lease.common.constant.RedisConstant;
 import com.atguigu.lease.common.login.LoginUser;
 import com.atguigu.lease.common.login.LoginUserHolder;
 import com.atguigu.lease.model.entity.*;
@@ -21,6 +22,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -70,6 +72,9 @@ public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo> i
     @Resource
     @Lazy
     private BrowsingHistoryService browsingHistoryService;
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 根据分页和查询条件获取房间列表
@@ -195,88 +200,99 @@ public class RoomInfoServiceImpl extends ServiceImpl<RoomInfoMapper, RoomInfo> i
      */
     @Override
     public RoomDetailVo getDetailById(Long id) {
-        // 初始化RoomDetailVo对象
-        RoomDetailVo roomDetailVo = new RoomDetailVo();
+        String key = RedisConstant.APP_ROOM_PREFIX + id;
+        RoomDetailVo roomDetailVo = (RoomDetailVo) redisTemplate.opsForValue()
+                .get(key);
 
-        // 根据ID获取房间信息，并将属性复制到RoomDetailVo对象中
-        RoomInfo roomInfo = getById(id);
-        BeanUtils.copyProperties(roomInfo, roomDetailVo);
+        // 缓存未命中房间详细信息
+        if (roomDetailVo == null) {
+            // 初始化RoomDetailVo对象
+            roomDetailVo = new RoomDetailVo();
 
-        // 初始化ApartmentItemVo对象
-        ApartmentItemVo apartmentItemVo = new ApartmentItemVo();
+            // 根据ID获取房间信息，并将属性复制到RoomDetailVo对象中
+            RoomInfo roomInfo = getById(id);
+            BeanUtils.copyProperties(roomInfo, roomDetailVo);
 
-        // 根据房间信息中的公寓ID获取公寓信息，并将属性复制到ApartmentItemVo对象中
-        ApartmentInfo apartmentInfo = apartmentInfoService.getById(roomInfo.getApartmentId());
-        BeanUtils.copyProperties(apartmentInfo, apartmentItemVo);
+            // 初始化ApartmentItemVo对象
+            ApartmentItemVo apartmentItemVo = new ApartmentItemVo();
 
-        // 获取公寓的标签信息，并设置到ApartmentItemVo对象中
-        List<LabelInfo> labelInfosOfApartment = labelInfoService.listByApartmentId(apartmentInfo.getId());
-        if (!CollectionUtils.isEmpty(labelInfosOfApartment)) {
-            apartmentItemVo.setLabelInfoList(labelInfosOfApartment);
-        }
+            // 根据房间信息中的公寓ID获取公寓信息，并将属性复制到ApartmentItemVo对象中
+            ApartmentInfo apartmentInfo = apartmentInfoService.getById(roomInfo.getApartmentId());
+            BeanUtils.copyProperties(apartmentInfo, apartmentItemVo);
 
-        // 获取公寓的图表信息，并设置到ApartmentItemVo对象中
-        List<GraphVo> graphVosOfApartment = graphInfoService.listByApartmentId(apartmentInfo.getId());
-        if (!CollectionUtils.isEmpty(graphVosOfApartment)) {
-            apartmentItemVo.setGraphVoList(graphVosOfApartment);
-        }
+            // 获取公寓的标签信息，并设置到ApartmentItemVo对象中
+            List<LabelInfo> labelInfosOfApartment = labelInfoService.listByApartmentId(apartmentInfo.getId());
+            if (!CollectionUtils.isEmpty(labelInfosOfApartment)) {
+                apartmentItemVo.setLabelInfoList(labelInfosOfApartment);
+            }
 
-        // 获取公寓下所有房间信息，以确定最小租金，并设置到ApartmentItemVo对象中
-        List<RoomInfo> roomInfos = listByApartmentId(roomInfo.getApartmentId());
-        if (!CollectionUtils.isEmpty(roomInfos)) {
-            RoomInfo roomInfoWithMinRent = roomInfos.stream()
-                    .min(Comparator.comparing(RoomInfo::getRent))
-                    .get();
+            // 获取公寓的图表信息，并设置到ApartmentItemVo对象中
+            List<GraphVo> graphVosOfApartment = graphInfoService.listByApartmentId(apartmentInfo.getId());
+            if (!CollectionUtils.isEmpty(graphVosOfApartment)) {
+                apartmentItemVo.setGraphVoList(graphVosOfApartment);
+            }
 
-            apartmentItemVo.setMinRent(roomInfoWithMinRent.getRent());
-        }
+            // 获取公寓下所有房间信息，以确定最小租金，并设置到ApartmentItemVo对象中
+            List<RoomInfo> roomInfos = listByApartmentId(roomInfo.getApartmentId());
+            if (!CollectionUtils.isEmpty(roomInfos)) {
+                RoomInfo roomInfoWithMinRent = roomInfos.stream()
+                        .min(Comparator.comparing(RoomInfo::getRent))
+                        .get();
 
-        // 将ApartmentItemVo对象设置到RoomDetailVo对象中
-        roomDetailVo.setApartmentItemVo(apartmentItemVo);
+                apartmentItemVo.setMinRent(roomInfoWithMinRent.getRent());
+            }
 
-        // 获取房间的图表信息，并设置到RoomDetailVo对象中
-        List<GraphVo> graphVosOfRoom = graphInfoService.listByRoomId(id);
-        if (!CollectionUtils.isEmpty(graphVosOfRoom)) {
-            roomDetailVo.setGraphVoList(graphVosOfRoom);
-        }
+            // 将ApartmentItemVo对象设置到RoomDetailVo对象中
+            roomDetailVo.setApartmentItemVo(apartmentItemVo);
 
-        // 获取房间的属性信息，并设置到RoomDetailVo对象中
-        List<AttrValueVo> attrValueVos = attrValueService.listByRoomId(id);
-        if (!CollectionUtils.isEmpty(attrValueVos)) {
-            roomDetailVo.setAttrValueVoList(attrValueVos);
-        }
+            // 获取房间的图表信息，并设置到RoomDetailVo对象中
+            List<GraphVo> graphVosOfRoom = graphInfoService.listByRoomId(id);
+            if (!CollectionUtils.isEmpty(graphVosOfRoom)) {
+                roomDetailVo.setGraphVoList(graphVosOfRoom);
+            }
 
-        // 查询房间设施信息，并设置到RoomDetailVo对象中
-        LambdaQueryWrapper<RoomFacility> roomFacilityQueryWrapper = new LambdaQueryWrapper<>();
-        roomFacilityQueryWrapper.eq(RoomFacility::getRoomId, id);
+            // 获取房间的属性信息，并设置到RoomDetailVo对象中
+            List<AttrValueVo> attrValueVos = attrValueService.listByRoomId(id);
+            if (!CollectionUtils.isEmpty(attrValueVos)) {
+                roomDetailVo.setAttrValueVoList(attrValueVos);
+            }
 
-        List<FacilityInfo> facilityInfos = facilityInfoService.listByRoomId(id);
-        if (!CollectionUtils.isEmpty(facilityInfos)) {
-            roomDetailVo.setFacilityInfoList(facilityInfos);
-        }
+            // 查询房间设施信息，并设置到RoomDetailVo对象中
+            LambdaQueryWrapper<RoomFacility> roomFacilityQueryWrapper = new LambdaQueryWrapper<>();
+            roomFacilityQueryWrapper.eq(RoomFacility::getRoomId, id);
 
-        // 获取房间的标签信息，并设置到RoomDetailVo对象中
-        List<LabelInfo> labelInfosOfRoom = labelInfoService.listByRoomId(id);
-        if (!CollectionUtils.isEmpty(labelInfosOfRoom)) {
-            roomDetailVo.setLabelInfoList(labelInfosOfRoom);
-        }
+            List<FacilityInfo> facilityInfos = facilityInfoService.listByRoomId(id);
+            if (!CollectionUtils.isEmpty(facilityInfos)) {
+                roomDetailVo.setFacilityInfoList(facilityInfos);
+            }
 
-        // 获取房间的支付方式信息，并设置到RoomDetailVo对象中
-        List<PaymentType> paymentTypes = paymentTypeService.listByRoomId(id);
-        if (!CollectionUtils.isEmpty(paymentTypes)) {
-            roomDetailVo.setPaymentTypeList(paymentTypes);
-        }
+            // 获取房间的标签信息，并设置到RoomDetailVo对象中
+            List<LabelInfo> labelInfosOfRoom = labelInfoService.listByRoomId(id);
+            if (!CollectionUtils.isEmpty(labelInfosOfRoom)) {
+                roomDetailVo.setLabelInfoList(labelInfosOfRoom);
+            }
 
-        // 获取公寓的费用信息，并设置到RoomDetailVo对象中
-        List<FeeValueVo> feeValueVos = feeValueService.listByApartmentId(roomInfo.getApartmentId());
-        if (!CollectionUtils.isEmpty(feeValueVos)) {
-            roomDetailVo.setFeeValueVoList(feeValueVos);
-        }
+            // 获取房间的支付方式信息，并设置到RoomDetailVo对象中
+            List<PaymentType> paymentTypes = paymentTypeService.listByRoomId(id);
+            if (!CollectionUtils.isEmpty(paymentTypes)) {
+                roomDetailVo.setPaymentTypeList(paymentTypes);
+            }
 
-        // 获取房间的租赁条款信息，并设置到RoomDetailVo对象中
-        List<LeaseTerm> leaseTerms = leaseTermService.listByRoomId(id);
-        if (!CollectionUtils.isEmpty(leaseTerms)) {
-            roomDetailVo.setLeaseTermList(leaseTerms);
+            // 获取公寓的费用信息，并设置到RoomDetailVo对象中
+            List<FeeValueVo> feeValueVos = feeValueService.listByApartmentId(roomInfo.getApartmentId());
+            if (!CollectionUtils.isEmpty(feeValueVos)) {
+                roomDetailVo.setFeeValueVoList(feeValueVos);
+            }
+
+            // 获取房间的租赁条款信息，并设置到RoomDetailVo对象中
+            List<LeaseTerm> leaseTerms = leaseTermService.listByRoomId(id);
+            if (!CollectionUtils.isEmpty(leaseTerms)) {
+                roomDetailVo.setLeaseTermList(leaseTerms);
+            }
+
+            // 缓存房间详细信息
+            redisTemplate.opsForValue()
+                    .set(key, roomDetailVo);
         }
 
         // 保存此次查询的浏览记录
